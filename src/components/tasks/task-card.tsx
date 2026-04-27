@@ -116,6 +116,14 @@ export function TaskCard({
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
+            {task.status !== TaskStatus.IN_PROGRESS && (
+              <DropdownMenuItem
+                onClick={() => onStatusChange?.(task.id, TaskStatus.IN_PROGRESS)}
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                <span>Mark as In Progress</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={handleToggleStatus}
             >
