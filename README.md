@@ -37,7 +37,7 @@ TaskFlow is a premium, real-time collaborative task manager built for modern tea
 ### 1. Clone the repository
 ```bash
 git clone <repository-url>
-cd jano_health_assignment
+cd task-flow-manager
 ```
 
 ### 2. Install dependencies
