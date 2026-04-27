@@ -28,15 +28,13 @@ export async function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10 border-2 border-border transition-colors hover:border-primary">
-            <AvatarImage src={session.user.image ?? ""} alt={session.user.name ?? "User"} />
-            <AvatarFallback className="bg-primary/10 text-primary font-medium">
-              {getInitials(session.user.name)}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+      <DropdownMenuTrigger className="relative h-10 w-10 rounded-full inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground">
+        <Avatar className="h-10 w-10 border-2 border-border transition-colors hover:border-primary">
+          <AvatarImage src={session.user.image ?? ""} alt={session.user.name ?? "User"} />
+          <AvatarFallback className="bg-primary/10 text-primary font-medium">
+            {getInitials(session.user.name)}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
