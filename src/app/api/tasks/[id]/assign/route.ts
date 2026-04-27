@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher-server";
 
 export async function POST(
   req: NextRequest,
@@ -60,7 +61,11 @@ export async function POST(
       },
     });
 
-    // TODO: Trigger Pusher event here
+    // Trigger Pusher event
+    await pusherServer.trigger(`user-${task.creatorId}`, "task:updated", task);
+    if (assigneeId && assigneeId !== task.creatorId) {
+      await pusherServer.trigger(`user-${assigneeId}`, "task:assigned", task);
+    }
 
     return NextResponse.json({
       task,

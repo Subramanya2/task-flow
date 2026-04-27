@@ -11,6 +11,7 @@ import { EditTaskDialog } from "@/components/tasks/edit-task-dialog";
 import { AssignTaskDialog } from "@/components/tasks/assign-task-dialog";
 import { TaskStatus, Priority } from "@prisma/client";
 import { toast } from "sonner";
+import { useRealtimeTasks } from "@/hooks/use-realtime-tasks";
 
 interface DashboardClientProps {
   initialTasks: TaskWithRelations[];
@@ -65,6 +66,29 @@ export function DashboardClient({ initialTasks, currentUserId }: DashboardClient
     
     claimPendingTasks();
   }, []);
+
+  // Real-time task events
+  useRealtimeTasks({
+    userId: currentUserId,
+    onTaskCreated: (task) => {
+      setTasks((prev) => [task, ...prev]);
+    },
+    onTaskUpdated: (task) => {
+      setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
+    },
+    onTaskDeleted: (taskId) => {
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    },
+    onTaskAssignedToMe: (task) => {
+      setTasks((prev) => {
+        // Only add if we don't already have it
+        if (!prev.some((t) => t.id === task.id)) {
+          return [task, ...prev];
+        }
+        return prev;
+      });
+    },
+  });
 
   const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
     // Optimistic update

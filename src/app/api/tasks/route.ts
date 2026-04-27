@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Priority, TaskStatus } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher-server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -75,7 +75,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // TODO: Trigger Pusher event here for real-time update
+    // Trigger Pusher event
+    await pusherServer.trigger(`user-${session.user.id}`, "task:created", task);
+    
+    // If assigned to someone else, trigger event for them too
+    if (assigneeId && assigneeId !== session.user.id) {
+      await pusherServer.trigger(`user-${assigneeId}`, "task:assigned", task);
+    }
 
     return NextResponse.json(task);
   } catch (error) {

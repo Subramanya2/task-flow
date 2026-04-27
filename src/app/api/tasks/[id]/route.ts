@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher-server";
 
 export async function GET(
   req: NextRequest,
@@ -77,7 +78,11 @@ export async function PATCH(
       },
     });
 
-    // TODO: Trigger Pusher event here
+    // Trigger Pusher event
+    await pusherServer.trigger(`user-${task.creatorId}`, "task:updated", task);
+    if (task.assigneeId && task.assigneeId !== task.creatorId) {
+      await pusherServer.trigger(`user-${task.assigneeId}`, "task:updated", task);
+    }
 
     return NextResponse.json(task);
   } catch (error) {
@@ -117,7 +122,11 @@ export async function DELETE(
       where: { id: p.id },
     });
 
-    // TODO: Trigger Pusher event here
+    // Trigger Pusher event
+    await pusherServer.trigger(`user-${existingTask.creatorId}`, "task:deleted", { id: p.id });
+    if (existingTask.assigneeId && existingTask.assigneeId !== existingTask.creatorId) {
+      await pusherServer.trigger(`user-${existingTask.assigneeId}`, "task:deleted", { id: p.id });
+    }
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
